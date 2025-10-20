@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Countdown Timers</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+
+        html,
+        body {
+            margin: 0;
+            height: 100%;
+            width: 100%;
+            background: #000000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: stretch;
+            width: 100%;
+            height: 100%;
+            padding: 3vh 4vw;
+            gap: 2vw;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .timer {
+            flex: 1;
+            background: #0f0f0f;
+            border-radius: 1.5vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.021);
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        .timer:hover {
+            background: #1e1e1e;
+            transform: scale(1.02);
+        }
+
+        .timer.fullscreen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: #000;
+            border-radius: 0;
+            transform: none;
+        }
+
+        .title {
+            font-size: clamp(1rem, 2vw, 2.5rem);
+            opacity: 0.8;
+            margin-bottom: 0.8vh;
+        }
+
+        .days {
+            font-size: clamp(6rem, 18vw, 25rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.03em;
+        }
+
+        #fullscreenBtn {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 1rem;
+            opacity: 0.8;
+            z-index: 2000;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+
+        #fullscreenBtn:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        #fullscreenBtn.hidden {
+            display: none;
+        }
+
+        @media (orientation: portrait) {
+            .container {
+                flex-direction: column;
+                gap: 3vh;
+            }
+
+            .days {
+                font-size: clamp(8rem, 22vw, 30rem);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="timers">
+        <div class="timer" data-date="2025-12-25">
+            <div class="title">Christmas 2025</div>
+            <div class="days">?</div>
+        </div>
+        <div class="timer" data-date="2025-01-01">
+            <div class="title">New Years 2026</div>
+            <div class="days">?</div>
+        </div>
+        <div class="timer" data-date="2026-04-05">
+            <div class="title">Easter 2026</div>
+            <div class="days">?</div>
+        </div>
+    </div>
+
+    <button id="fullscreenBtn">⛶ Full Screen</button>
+
+    <script>
+        const timers = document.querySelectorAll('.timer');
+        const container = document.querySelector('.container');
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        function updateTimers() {
+            const now = new Date();
+            timers.forEach(timer => {
+                const target = new Date(timer.dataset.date);
+                const diffTime = target - now;
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                timer.querySelector('.days').textContent = diffDays > 0 ? diffDays : "❌";
+            });
+        }
+
+        updateTimers();
+        setInterval(updateTimers, 60000);
+
+        timers.forEach(timer => {
+            timer.addEventListener('click', () => {
+                const isFullscreen = timer.classList.toggle('fullscreen');
+                timers.forEach(t => {
+                    if (t !== timer) t.style.display = isFullscreen ? 'none' : 'flex';
+                });
+                container.style.gap = isFullscreen ? '0' : '2vw';
+            });
+        });
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().then(() => {
+
+                    fullscreenBtn.classList.add('hidden');
+
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                fullscreenBtn.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>
